@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class Bed {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private String type; // "ICU", "General", etc.
     private String diseaseTag;
