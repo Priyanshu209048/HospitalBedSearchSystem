@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PatientDao extends JpaRepository<Patient, String> {
+
+    Boolean existsByEmail(String email);
+    Patient findByEmail(String email);
+
 }
