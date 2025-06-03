@@ -1,24 +1,20 @@
-package com.project.hospitalbedsearchsystem.entities;
+package com.project.hospitalbedsearchsystem.payloads;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Hospital {
-    @Id
+public class PatientDTO {
     private String id;
-
-    private String name;
+    private String fullName;
+    private int age;
+    private String gender;
     private String phoneNumber;
     private String email;
+    private String password;
     private String address;
-    private String specialization;
-
-    private int locationId;
+    private LocationDTO locationDTO;
 }
-

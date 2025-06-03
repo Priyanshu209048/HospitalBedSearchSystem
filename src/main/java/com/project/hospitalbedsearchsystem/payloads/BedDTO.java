@@ -1,24 +1,17 @@
-package com.project.hospitalbedsearchsystem.entities;
+package com.project.hospitalbedsearchsystem.payloads;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Bed {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class BedDTO {
     private int id;
-
     private String type;
     private String diseaseTag;
     private int totalBeds;
     private int availableBeds;
-
-    private String hospitalId;
+    private HospitalDTO hospitalDTO;
 }
-
