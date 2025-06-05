@@ -1,6 +1,6 @@
 package com.project.hospitalbedsearchsystem.exceptions;
 
-import com.project.farmeasyportal.payloads.ApiResponse;
+import com.project.hospitalbedsearchsystem.payloads.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

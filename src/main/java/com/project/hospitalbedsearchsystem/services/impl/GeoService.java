@@ -1,11 +1,15 @@
 package com.project.hospitalbedsearchsystem.services.impl;
 
-import com.project.hospitalbedsearchsystem.dao.LocationDao;
 import com.project.hospitalbedsearchsystem.entities.Location;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
@@ -15,31 +19,38 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class GeoService {
 
-    private final LocationDao locationDao;
+    private static final Logger log = LoggerFactory.getLogger(GeoService.class);
+    @Value("${locationiq.api.key}")
+    private String apiKey;
 
-    public Location saveCoordinatesFromAddress(String address) {
-        RestTemplate restTemplate = new RestTemplate();
-        String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + encodedAddress + "&key=YOUR_API_KEY";
+    public Location getCoordinatesFromAddress(String address) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        JSONObject json = new JSONObject(response.getBody());
+            String encodedAddress = address.replace(" ", "+");
+            /*String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);*/
 
-        if (!json.getJSONArray("results").isEmpty()) {
-            JSONObject location = json.getJSONArray("results")
-                    .getJSONObject(0)
-                    .getJSONObject("geometry")
-                    .getJSONObject("location");
+            log.info("Encoded Address : {} ", encodedAddress);
+            log.info("API Key: {} ", apiKey);
 
-            double lat = location.getDouble("lat");
-            double lng = location.getDouble("lng");
+            String url = "https://us1.locationiq.com/v1/search?key=" + apiKey +
+                    "&q=" + encodedAddress + "&format=json";
 
-            Location loc = new Location();
-            loc.setLatitude(lat);
-            loc.setLongitude(lng);
-            return locationDao.save(loc);
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            JSONArray array = new JSONArray(response.getBody());
+            JSONObject obj = array.getJSONObject(0);
+
+            Location location = new Location();
+            location.setLatitude(obj.getDouble("lat"));
+            location.setLongitude(obj.getDouble("lon"));
+
+            return location;
+        } catch (HttpClientErrorException e) {
+            System.err.println("API Error: " + e.getResponseBodyAsString());
+            throw new RuntimeException("API Error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error during geocoding: " + e.getMessage(), e);
         }
-
-        throw new RuntimeException("Unable to geocode address");
     }
 }
