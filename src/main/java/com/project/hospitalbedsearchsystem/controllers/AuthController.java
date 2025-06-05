@@ -59,7 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("/register/patient")
-    public ResponseEntity<?> registerFarmer(@RequestBody @Valid PatientDTO patientDTO) {
+    public ResponseEntity<?> registerPatient(@RequestBody @Valid PatientDTO patientDTO) {
         if (userService.isUserExistByEmail(patientDTO.getEmail())) {
             return new ResponseEntity<>(new ApiResponse("User already exists"), HttpStatus.CONFLICT);
         }

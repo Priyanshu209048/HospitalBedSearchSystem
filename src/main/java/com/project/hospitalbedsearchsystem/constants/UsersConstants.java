@@ -5,6 +5,7 @@ public class UsersConstants {
     public static String USER = "User";
     public static String PATIENT = "Patient";
     public static String HOSPITAL = "Hospital";
+    public static String LOCATION = "Location";
 
     public static String ROLE_PATIENT = "ROLE_PATIENT";
     public static String ROLE_HOSPITAL = "ROLE_HOSPITAL";

@@ -42,7 +42,8 @@ public class PatientServiceImpl implements PatientService {
         patientDTO.setPassword(password);
 
         Patient patient = modelMapper.map(patientDTO, Patient.class);
-        Location location = this.geoService.saveCoordinatesFromAddress(patientDTO.getAddress());
+        Location location = this.geoService.getCoordinatesFromAddress(patientDTO.getAddress());
+        locationDao.save(location);
         patient.setLocationId(location.getId());
 
         User user = new User();
@@ -52,12 +53,38 @@ public class PatientServiceImpl implements PatientService {
         userDao.save(user);
 
         Patient save = patientDao.save(patient);
-        return this.modelMapper.map(save, PatientDTO.class);
+        PatientDTO map = this.modelMapper.map(save, PatientDTO.class);
+        map.setLocationDTO(this.modelMapper.map(location, LocationDTO.class));
+        return map;
     }
 
     @Override
     public PatientDTO updatePatient(String id, PatientDTO patientDTO) {
-        return null;
+        Patient patient = this.patientDao.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(UsersConstants.PATIENT, UsersConstants.ID, id));
+
+        patient.setFullName(patientDTO.getFullName());
+        patient.setAge(patientDTO.getAge());
+        patient.setGender(patientDTO.getGender());
+        patient.setPhoneNumber(patientDTO.getPhoneNumber());
+        patient.setEmail(patientDTO.getEmail());
+
+        if (!patientDTO.getAddress().trim().equalsIgnoreCase(patient.getAddress().trim())) {
+            Location newLocation = geoService.getCoordinatesFromAddress(patientDTO.getAddress());
+
+            Location existingLocation = locationDao.findById(patient.getLocationId()).orElseThrow(() ->
+                    new ResourceNotFoundException(UsersConstants.LOCATION, UsersConstants.ID, String.valueOf(patient.getLocationId())));
+
+            existingLocation.setLatitude(newLocation.getLatitude());
+            existingLocation.setLongitude(newLocation.getLongitude());
+            locationDao.save(existingLocation);
+
+            patient.setAddress(patientDTO.getAddress());
+        }
+
+        Patient update = patientDao.save(patient);
+
+        return this.modelMapper.map(update, PatientDTO.class);
     }
 
     @Override
