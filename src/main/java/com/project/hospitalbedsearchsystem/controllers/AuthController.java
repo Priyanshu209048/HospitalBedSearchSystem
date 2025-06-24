@@ -5,6 +5,7 @@ import com.project.hospitalbedsearchsystem.dao.UserDao;
 import com.project.hospitalbedsearchsystem.entities.User;
 import com.project.hospitalbedsearchsystem.exceptions.ResourceNotFoundException;
 import com.project.hospitalbedsearchsystem.payloads.*;
+import com.project.hospitalbedsearchsystem.services.HospitalService;
 import com.project.hospitalbedsearchsystem.services.PatientService;
 import com.project.hospitalbedsearchsystem.services.UserService;
 import jakarta.validation.Valid;
@@ -34,6 +35,7 @@ public class AuthController {
     private final ModelMapper modelMapper;
     private final UserDao userDao;
     private final PatientService patientService;
+    private final HospitalService hospitalService;
 
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request){
@@ -68,14 +70,14 @@ public class AuthController {
         return new ResponseEntity<>(farmerRegistered, HttpStatus.CREATED);
     }
 
-    /*@PostMapping("/register/bank")
+    @PostMapping("/register/hospital")
     public ResponseEntity<?> registerBank(@RequestBody @Valid HospitalDTO hospitalDTO) {
-        if (this.hospitalService.isBankExistByEmail(hospitalDTO.getEmail())) {
+        if (this.hospitalService.isHospitalExistByEmail(hospitalDTO.getEmail())) {
             return new ResponseEntity<>(new ApiResponse("Bank already exists !!"), HttpStatus.CONFLICT);
         }
 
-        HospitalDTO bank = this.hospitalService.addBank(hospitalDTO);
-        return new ResponseEntity<>(new ApiResponse("Bank registered successfully"), HttpStatus.CREATED);
-    }*/
+        HospitalDTO hospitalRegistered = this.hospitalService.saveHospital(hospitalDTO);
+        return new ResponseEntity<>(hospitalRegistered, HttpStatus.CREATED);
+    }
 
 }
